@@ -19,6 +19,7 @@ library(corrplot)
 
 ```
 
+
 ```{r}
 train = read.csv("/Users/allenzhang/Desktop/kaggle_data_set/Titanic/train.csv")
 test = read.csv("/Users/allenzhang/Desktop/kaggle_data_set/Titanic/test.csv")
@@ -35,6 +36,7 @@ summary(data)
 sapply(data,function(x) sum(is.na(x)))
 sapply(data,function(x) sum(x == ""))
 ```
+
 
 ```{r}
 Embarked.na <- data$Embarked
@@ -56,20 +58,24 @@ ggplot(data[!is.na(data$Embarked),],aes(x=Embarked, y=Fare, fill=factor(Pclass))
 
 ```
 
+
 ```{r}
 data$Embarked[c(62,830)] <- "C"
 sapply(data,function(x) sum(x == ""))
 ```
+
 
 ```{r}
 Fare.na = is.na(data$Fare)
 which(Fare.na %in% TRUE)
 ```
 
+
 ```{r}
 data_1044 = data[data$PassengerId == 1044,]
 data_1044
 ```
+
 
 ```{r}
 ggplot(data[data$Embarked=='S' & data$Pclass == 3,],aes(x=Embarked, y=Fare, fill=factor(Pclass))) +
@@ -83,12 +89,24 @@ b = median(data$Fare[data$Embarked == 'S' & data$Pclass ==3], na.rm = T)
 
 ```
 
+
 ```{r}
 data$Fare[1044] = 8.05
 sapply(data, function(x) sum(is.na(x)))
 ```
 
 ```{r}
+data[is.na(data$Age),]
+```
+
+
+```{r}
+set.seed(129)
+
+ss <- c('PassengerId','Name','Ticket','Cabin','family','Surname','Survived')
+mice_age <- mice(data[,!names(data) %in% ss],method = 'rf')
+mice_output <- complete(mice_age)
 
 ```
+
 
