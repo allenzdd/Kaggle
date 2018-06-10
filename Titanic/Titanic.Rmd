@@ -72,6 +72,23 @@ data_1044
 ```
 
 ```{r}
+ggplot(data[data$Embarked=='S' & data$Pclass == 3,],aes(x=Embarked, y=Fare, fill=factor(Pclass))) +
+  geom_boxplot() + 
+  geom_hline(aes(yintercept=80), color='red', linetype='dashed', lwd=2) +
+  scale_y_continuous(labels=dollar_format())
+```
+
+```{r}
+b = median(data$Fare[data$Embarked == 'S' & data$Pclass ==3], na.rm = T)
+
+```
+
+```{r}
+data$Fare[1044] = 8.05
+sapply(data, function(x) sum(is.na(x)))
+```
+
+```{r}
 
 ```
 
