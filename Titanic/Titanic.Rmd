@@ -126,10 +126,13 @@ data$Age <- mice_output$Age
 ```{r}
 sapply(data,function(x) sum(is.na(x)))
 sapply(data,function(x) sum(x == ""))
+summary(data)
 ```
 
 
 ### Analysis
+
+#### Pclass
 ```{r}
 
 data$Survived <- factor(data$Survived)
@@ -143,8 +146,158 @@ ggplot(data = data[1:nrow(train),], mapping = aes(x = Pclass, y = ..count.., fil
   theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
 ```
 
+#### Name Title
+```{r}
+data$Title <- sapply(data$Name, FUN=function(x) {strsplit(x, split='[,.]')[[1]][2]})
+data$Title <- sub(" ","",data$Title)
+table(data$Title)               
+
+```
+
+```{r}
+Others <- c('Capt','Col','Don','Dona','Jonkheer','Lady','Major','Sir','the Countess')
+data$Title[data$Title=='Mlle'] <- 'Miss'
+data$Title[data$Title=='Mme'] <- 'Mrs'
+data$Title[data$Title=='Ms'] <- 'Miss'
+data$Title[data$Title %in% Others] <- 'Others'
+table(data$Title)
+
+```
+
+```{r}
+ggplot(data = data[1:891,], mapping = aes(x = Title, y = ..count.., fill=Survived)) + 
+  geom_bar(stat = "count", position='stack') + 
+  xlab('Title') + 
+  ylab('Count') + 
+  ggtitle('Different Title impact survivor') + 
+  scale_fill_discrete(name="Survived", breaks=c(0, 1), labels=c("0", "1")) + 
+  geom_text(stat = "count", aes(label = ..count..), position=position_stack(vjust = 0.5)) +
+  theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+
+```
+#### sex
+```{r}
+data$Sex <- as.factor(data$Sex)
+ggplot(data = data[1:891,], mapping = aes(x = Sex, y = ..count.., fill=Survived)) + 
+  geom_bar(stat = 'count', position='dodge') + 
+  xlab('Sex') + 
+  ylab('Count') + 
+  ggtitle('Different Sex impact survivor') + 
+  geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), , vjust=-0.5) + 
+  theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+```
+
+#### Family Size
+```{r}
+#### SibSp
+ggplot(data = data[1:891,], mapping = aes(x = SibSp, y = ..count.., fill=Survived)) + 
+  geom_bar(stat = 'count', position='dodge') + 
+  labs(title = "Different SibSp impact survivor", x = "Sibsp", y = "Count", fill = "Survived") + 
+  geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), , vjust=-0.5) +
+  scale_x_continuous(breaks = c(0:8)) +
+  theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+#### Parch
+ggplot(data = data[1:891,], mapping = aes(x = Parch, y = ..count.., fill=Survived)) + 
+  geom_bar(stat = 'count', position='dodge') + 
+  labs(title = "Different Parch impact survivor", x = "Parch", y = "Count", fill = "Survived") + 
+  geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), , vjust=-0.5) + 
+  scale_x_continuous(breaks = c(0:6)) +
+  theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+```
+
+```{r}
+data$FamilySize <- data$SibSp + data$Parch + 1
+data$FamilySize
+```
+
+
 ```{r}
 
+ggplot(data = data[1:891,], mapping = aes(x = FamilySize, y = ..count.., fill=Survived)) + 
+  geom_bar(stat = 'count', position='dodge') + 
+  xlab('FamilySize') + 
+  ylab('Count') + 
+  ggtitle('Different FamilySize impact survivor') + 
+  geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), , vjust=-0.5) + 
+  scale_x_continuous(breaks = c(0:11)) +
+  theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+```
+
+#### Age
+```{r}
+ggplot(data[!is.na(data$Survived),],aes(Age,color=Survived))+
+ geom_bar(stat = 'count', position='dodge') + 
+  xlab('Age') + 
+  ylab('Count') + 
+  theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+
+```
+
+
+```{r}
+data$Age_New[data$Age < 18] <- 'child'
+data$Age_New[data$Age >= 18] <- 'adult'
+# data$Age_New
+table(data$Age_New,data$Survived)
+```
+
+```{r}
+ggplot(data[!is.na(data$Survived),],aes(Age_New,fill=Survived))+
+  geom_bar(stat = 'count',position = 'dodge')+
+  ggtitle('Adult and Child  Impact Survivor')+
+  geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), , vjust=-0.5) + 
+  theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+
+```
+#### Ticket
+```{r}
+ticket.count <- aggregate(data$Ticket, by = list(data$Ticket), function(x) sum(!is.na(x)))
+ticket.count
+table(ticket.count$x)
+```
+
+#### Fare
+```{r}
+ggplot(data = data[!is.na(data$Survived) ,], aes(x = Fare, color=Survived)) + 
+  geom_line(aes(label=..count..), stat = 'bin', binwidth=10)  + 
+  labs(title = "Different Fare impact survivor", x = "Fare", y = "Count", fill = "Survived")+
+  theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+
+```
+
+#### Embarked
+```{r}
+ggplot(data[1:891, ], mapping = aes(x = Embarked, y = ..count.., fill = Survived)) +
+  geom_bar(stat = 'count', position='dodge') + 
+  xlab('Embarked') +
+  ylab('Count') +
+  ggtitle('Different Embarked impact survivor') +
+  geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), , vjust=-0.5) + 
+  theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+```
+
+
+### Predict
+```{r}
+data$Pclass <- factor(data$Pclass)
+data$Title <- factor(data$Title)
+data$Sex <- factor(data$Sex)
+data$Age_New <- factor(data$Age_New)
+data$FamilySize <- factor(data$FamilySize)
+data$Fare <- factor(data$Fare)
+data$Embarked <- factor(data$Embarked)
+train <- data[1:891,]
+test <- data[892:1309,]
+
+model <- cforest(Survived ~ Pclass + Title + Sex + Age_New + FamilySize + Fare + Embarked, data = train,controls = cforest_unbiased(ntree=2000,mtry=3))
+
+```
+
+```{r}
+prediction<-predict(model,newdata = test,OOB=TRUE,type = "response") 
+output<-data.frame(PassengerId=test$PassengerId,Survived=prediction)
+output
+write.csv(output,file = "/Users/allenzhang/Desktop/kaggle_data_set/Titanic/res.csv",row.names = FALSE)
 ```
 
 
