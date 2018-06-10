@@ -1,0 +1,77 @@
+---
+title: "Titanic"
+author: "Dongdong Zhang"
+date: "11/06/2018"
+output: html_document
+---
+
+```{r}
+# library
+library(ggplot2)
+library(ggthemes)
+library(scales)
+library(plyr)
+library(dplyr)
+library(mice)
+library(randomForest)
+library(party)
+library(corrplot)
+
+```
+
+```{r}
+train = read.csv("/Users/allenzhang/Desktop/kaggle_data_set/Titanic/train.csv")
+test = read.csv("/Users/allenzhang/Desktop/kaggle_data_set/Titanic/test.csv")
+```
+
+```{r}
+str(train)
+str(test)
+data <- bind_rows(train,test)
+summary(data)
+```
+
+```{r}
+sapply(data,function(x) sum(is.na(x)))
+sapply(data,function(x) sum(x == ""))
+```
+
+```{r}
+Embarked.na <- data$Embarked
+which(Embarked.na %in% "")
+```
+
+```{r}
+data_62 <- data[data$PassengerId == 62,]
+data_830 <- data[data$PassengerId == 830,]
+data_62
+data_830
+```
+
+```{r}
+ggplot(data[!is.na(data$Embarked),],aes(x=Embarked, y=Fare, fill=factor(Pclass))) +
+  geom_boxplot() + 
+  geom_hline(aes(yintercept=80), color='red', linetype='dashed', lwd=2) +
+  scale_y_continuous(labels=dollar_format())
+
+```
+
+```{r}
+data$Embarked[c(62,830)] <- "C"
+sapply(data,function(x) sum(x == ""))
+```
+
+```{r}
+Fare.na = is.na(data$Fare)
+which(Fare.na %in% TRUE)
+```
+
+```{r}
+data_1044 = data[data$PassengerId == 1044,]
+data_1044
+```
+
+```{r}
+
+```
+
