@@ -109,4 +109,42 @@ mice_output <- complete(mice_age)
 
 ```
 
+```{r}
+
+par(mfrow=c(1,2))
+hist(data$Age,freq = F,main = 'Age:ORiginal Data',col='darkblue',ylim = c(0,0.04))
+hist(mice_output$Age,freq = F,main = 'Age:MICE Output',col = 'skyblue',ylim = c(0,0.04))
+
+
+```
+
+```{r}
+data$Age <- mice_output$Age
+
+```
+
+```{r}
+sapply(data,function(x) sum(is.na(x)))
+sapply(data,function(x) sum(x == ""))
+```
+
+
+### Analysis
+```{r}
+
+data$Survived <- factor(data$Survived)
+ggplot(data = data[1:nrow(train),], mapping = aes(x = Pclass, y = ..count.., fill=Survived)) + 
+  geom_bar(stat = "count", position='dodge') + 
+  xlab('Pclass') + 
+  ylab('Count') + 
+  ggtitle('Different Pclass impact survived') + 
+  scale_fill_manual(values=c("#FF0000", "#00FF00")) +
+  geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), , vjust=-0.5) + 
+  theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+```
+
+```{r}
+
+```
+
 
